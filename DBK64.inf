@@ -1,0 +1,80 @@
+;
+; kashef64.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ManufacturerName%
+CatalogFile=kashef64.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+kashef64_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kashef64.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%kashef64.DeviceDesc%=kashef64_Device, Root\kashef64 ; TODO: edit hw-id
+
+[kashef64_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+kashef64.sys
+
+;-------------- Service installation
+[kashef64_Device.NT.Services]
+AddService = kashef64,%SPSVCINST_ASSOCSERVICE%, kashef64_Service_Inst
+
+; -------------- kashef64 driver install sections
+[kashef64_Service_Inst]
+DisplayName    = %kashef64.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kashef64.sys
+
+;
+;--- kashef64_Device Coinstaller installation ------
+;
+
+[kashef64_Device.NT.CoInstallers]
+AddReg=kashef64_Device_CoInstaller_AddReg
+CopyFiles=kashef64_Device_CoInstaller_CopyFiles
+
+[kashef64_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[kashef64_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[kashef64_Device.NT.Wdf]
+KmdfService =  kashef64, kashef64_wdfsect
+[kashef64_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="justa driver" ;TODO: Replace with your manufacturer name
+ClassName="System" ; TODO: edit ClassName
+DiskName = "kashef64 Installation Disk"
+kashef64.DeviceDesc = "kashef64 Device"
+kashef64.SVCDESC = "kashef64 Service"

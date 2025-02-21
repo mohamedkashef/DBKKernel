@@ -11,6 +11,7 @@ typedef struct {
 	DWORD d;
 } UINT128;
 
+//hhj
 typedef volatile struct {
 	UINT128 Reserved1;
 	UINT128 Reserved2;
